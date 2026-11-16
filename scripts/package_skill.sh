@@ -1,28 +1,30 @@
 #!/usr/bin/env bash
 # Reproducible packaging script for Agensi AI Agent Skill
+# Produces verified loan-approval-ai-skill-final.zip
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-DIST_ZIP="$PROJECT_ROOT/loan-approval-ai-skill.zip"
+DIST_ZIP="$PROJECT_ROOT/loan-approval-ai-skill-final.zip"
+LEGACY_DIST_ZIP="$PROJECT_ROOT/loan-approval-ai-skill.zip"
 STAGE_DIR="/tmp/agensi-pack-$$"
 TARGET_DIR="$STAGE_DIR/loan-approval-ai-skill"
 
 echo "======================================================================"
-echo " Packaging Agensi AI Agent Skill: loan-approval-ai-skill.zip"
+echo " Packaging Agensi AI Agent Skill: loan-approval-ai-skill-final.zip"
 echo "======================================================================"
 
 # Clean previous build artifacts
-rm -rf "$STAGE_DIR" "$DIST_ZIP"
+rm -rf "$STAGE_DIR" "$DIST_ZIP" "$LEGACY_DIST_ZIP"
 mkdir -p "$TARGET_DIR"
 
 # 1. Copy core Agensi skill metadata and documents
 cp "$PROJECT_ROOT/agensi-skill/SKILL.md" "$TARGET_DIR/SKILL.md"
 cp "$PROJECT_ROOT/agensi-skill/README.md" "$TARGET_DIR/README.md"
+cp "$PROJECT_ROOT/agensi-skill/requirements-skill.txt" "$TARGET_DIR/requirements-skill.txt"
 cp "$PROJECT_ROOT/LICENSE" "$TARGET_DIR/LICENSE"
-cp "$PROJECT_ROOT/requirements.txt" "$TARGET_DIR/requirements.txt"
 
 # 2. Copy directories (dereferencing symlinks for standalone distribution)
 cp -rL "$PROJECT_ROOT/agensi-skill/references" "$TARGET_DIR/references"
@@ -47,6 +49,9 @@ find "$TARGET_DIR" -type f -name ".DS_Store" -delete 2>/dev/null || true
 cd "$STAGE_DIR"
 zip -r -q "$DIST_ZIP" "loan-approval-ai-skill"
 
+# Also maintain copy as loan-approval-ai-skill.zip for backward compatibility
+cp "$DIST_ZIP" "$LEGACY_DIST_ZIP"
+
 # 6. Clean stage directory
 rm -rf "$STAGE_DIR"
 
@@ -55,7 +60,7 @@ echo "Archive created successfully at: $DIST_ZIP"
 echo "File size: $(du -h "$DIST_ZIP" | cut -f1)"
 echo "----------------------------------------------------------------------"
 echo "Verifying archive structure:"
-unzip -l "$DIST_ZIP" | head -n 35
+unzip -l "$DIST_ZIP"
 echo "----------------------------------------------------------------------"
 
 # 8. Check that SKILL.md is located at the root of the folder

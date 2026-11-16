@@ -1,18 +1,20 @@
 # Interpreting SHAP Model Explanations Responsibly
 
 ## 1. Overview
-The Loan Approval System integrates **SHAP (SHapley Additive exPlanations)** to provide transparent, quantitative explanations for every prediction.
+The Loan Approval System integrates **SHAP (SHapley Additive exPlanations)** to provide transparent, quantitative feature attributions for each applicant prediction.
+
+---
 
 ## 2. Generating Explanations
 
-### CLI Command
-```bash
-python -m cli.main explain --input examples/example_input.json --plot docs/waterfall.png
-```
+Execute from the extracted package root:
 
-### Agensi Script
 ```bash
-python agensi-skill/scripts/explain.py --input agensi-skill/examples/example_input.json
+# Generate JSON feature attribution report
+python scripts/explain.py --input examples/example_input.json
+
+# Optionally render and save a visual waterfall plot
+python scripts/explain.py --input examples/example_input.json --plot waterfall.png
 ```
 
 ---
@@ -45,7 +47,7 @@ python agensi-skill/scripts/explain.py --input agensi-skill/examples/example_inp
     "EMI_log": 0.1196
   },
   "human_readable_summary": "The applicant meets the requirements for loan approval...",
-  "disclaimer": "SHAP explanations illustrate feature weights..."
+  "disclaimer": "SHAP explanations illustrate feature weights in an empirical model..."
 }
 ```
 
@@ -54,22 +56,22 @@ python agensi-skill/scripts/explain.py --input agensi-skill/examples/example_inp
 ## 4. How to Interpret Feature Contributions
 
 1. **Base Value (`base_value`):**
-   - The expected probability of loan approval across the entire training dataset (~68.8%).
+   - The average predicted approval probability across the historical training baseline (~68.8%).
 2. **SHAP Value (`shap_value`):**
-   - The degree to which a specific applicant feature shifted the probability away from the base value.
-   - **Positive SHAP Value:** Feature increased the probability of approval.
-   - **Negative SHAP Value:** Feature decreased the probability of approval (risk factor).
+   - The marginal contribution of each applicant feature shifting the probability toward approval (`+`) or rejection (`-`).
+   - **Positive SHAP Value:** Feature increased the likelihood of approval.
+   - **Negative SHAP Value:** Feature decreased the likelihood of approval (identified risk factor).
 3. **Global Feature Importance:**
-   - `Credit_History` (~55.8%): Dominant factor across all applicants. Delinquency history is the most common reason for rejection.
+   - `Credit_History` (~55.8%): The single most decisive factor. A value of `0` almost universally drives rejection.
    - `Total_Income_log` (~17.3%): Overall earning power.
-   - `Balance_Income_log` (~15.0%): Net buffer after paying the monthly loan installment.
-   - `EMI_log` (~12.0%): Loan installment burden relative to term.
+   - `Balance_Income_log` (~15.0%): Net disposable buffer after paying the monthly loan installment.
+   - `EMI_log` (~12.0%): Monthly debt installment obligation relative to requested term.
 
 ---
 
 ## 5. Responsible AI & Advisory Boundaries
 
-When reporting SHAP explanations to end users:
-- **Never present model explanations as financial advice:** SHAP values represent statistical attribution within an empirical Random Forest model.
-- **Do not promise approval based on adjustments:** E.g., do not say "If you increase your income by $500, your loan is guaranteed to be approved." State instead: "In this statistical model, higher income positively correlates with approval probability."
-- **Highlight adverse factors respectfully:** When explaining rejection, clearly point out the primary risk driver (e.g. `Credit_History = 0` or insufficient `Balance_Income`).
+When communicating SHAP explanations to users or loan applicants:
+- **Do Not Promise Approvals:** Never state that changing an attribute guarantees approval (e.g., do not say "If you increase your income by $500, your loan will be approved"). State instead: "Higher income positively correlates with approval probability in this model."
+- **Fair Lending Context:** The model omits demographic features (`Gender`, `Married`, `Education`, `Property_Area`) to avoid direct disparate treatment. However, agents must understand that demographic exclusion alone does not eliminate indirect proxy correlation.
+- **Decision-Support Status:** Emphasize that the explanation reflects the internal reasoning of an empirical Random Forest model and is intended for preliminary evaluation only.

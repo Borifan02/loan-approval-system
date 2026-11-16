@@ -1,0 +1,9 @@
+# Lightweight runtime dependencies for Agensi AI Agent Skill
+# Headless loan prediction & SHAP explainability engine (no Streamlit, PyArrow, Seaborn, XGBoost)
+
+numpy>=1.22.0,<2.0.0
+pandas>=1.5.0,<3.0.0
+scikit-learn>=1.3.0,<2.0.0
+joblib>=1.2.0,<2.0.0
+shap>=0.44.0,<1.0.0
+matplotlib>=3.7.0,<4.0.0

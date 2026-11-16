@@ -9,18 +9,18 @@ All requests must provide valid JSON objects containing the required financial p
 ### Required Financial Fields
 | Field Name | Type | Valid Range / Format | Description | Required? |
 |---|---|---|---|---|
-| `ApplicantIncome` | Float / Int | `>= 0.0` (USD) | Primary applicant's monthly gross income. | **Yes** |
-| `CoapplicantIncome` | Float / Int | `>= 0.0` (USD) | Secondary / co-borrower monthly gross income. | **Yes** |
-| `LoanAmount` | Float / Int | `> 0.0` and `<= 10000.0` | Requested loan principal in **thousands** of USD (e.g., `150` = $150,000). | **Yes** |
+| `ApplicantIncome` | Float / Int | `>= 0.0` (currency units) | Primary applicant's monthly gross income. | **Yes** |
+| `CoapplicantIncome` | Float / Int | `>= 0.0` (currency units) | Secondary / co-borrower monthly gross income. | **Yes** |
+| `LoanAmount` | Float / Int | `> 0.0` and `<= 10000.0` | Requested principal in **thousands** of currency units (e.g., `120` = 120,000 units). | **Yes** |
 | `Loan_Amount_Term` | Float / Int | `12.0` to `480.0` (months) | Loan repayment period in months (e.g. `360` = 30 years, `180` = 15 years). | **Yes** |
-| `Credit_History` | Float / Int | `1` or `0` | Binary indicator whether applicant meets credit guidelines (1 = yes, 0 = no). | **Yes** |
+| `Credit_History` | Float / Int | `1` or `0` | Binary indicator whether applicant meets credit guidelines (1 = meets, 0 = does not). | **Yes** |
 
-*Note: Combined household income (`ApplicantIncome + CoapplicantIncome`) must be strictly greater than $0.00.*
+*Note: Combined household income (`ApplicantIncome + CoapplicantIncome`) must be strictly greater than 0.*
 
 ---
 
 ### Optional Contextual & Demographic Fields
-These fields are preserved for application completeness and record-keeping, but are **excluded from the active machine learning model** in accordance with fair lending principles (ECOA).
+These fields are preserved for applicant profile completeness, but are **excluded from the active machine learning model** to mitigate direct demographic bias.
 
 | Field Name | Type | Permitted Values | Normalization Mapping |
 |---|---|---|---|
@@ -30,6 +30,8 @@ These fields are preserved for application completeness and record-keeping, but 
 | `Education` | String | `"Graduate"`, `"Not Graduate"` | Case-insensitive ("undergraduate" mapped to "Not Graduate") |
 | `Self_Employed` | String | `"Yes"`, `"No"` | Case-insensitive |
 | `Property_Area` | String | `"Urban"`, `"Semiurban"`, `"Rural"` | Case-insensitive |
+
+> **Fair Lending & Regulatory Notice:** Omitting demographic attributes reduces direct bias in model scoring. However, demographic feature omission **does not by itself guarantee legal compliance with the Equal Credit Opportunity Act (ECOA) or Regulation B**, because proxy discrimination or disparate impact may still arise through correlated variables. This software is an informational decision-support tool.
 
 ---
 
@@ -52,7 +54,7 @@ These fields are preserved for application completeness and record-keeping, but 
 ```
 
 ## Validation Error Handling
-If any required field is missing or contains invalid data types (e.g., negative income, non-numeric strings), the system returns an informative validation error with exit code `1`:
+If any required field is missing or contains invalid values (e.g., negative income, non-numeric strings), the system returns an informative validation error with exit code `1`:
 
 ```json
 {

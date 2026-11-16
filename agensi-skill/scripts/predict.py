@@ -42,7 +42,7 @@ except ImportError as err:
                 "message": (
                     f"Failed to import 'loan_approval' package: {err}. "
                     "Ensure virtualenv is activated and dependencies are installed "
-                    "(pip install -r requirements.txt)."
+                    "(pip install -r requirements-skill.txt)."
                 ),
             },
             indent=2,
@@ -56,15 +56,33 @@ def parse_input(raw_input: str) -> dict:
     """Parses JSON input from file path or inline JSON string."""
     candidate_path = Path(raw_input)
     if candidate_path.is_file():
-        with open(candidate_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(candidate_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                return data
+            raise ValueError(
+                f"JSON in '{raw_input}' must be a key-value dictionary object, got {type(data).__name__}"
+            )
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"File '{raw_input}' contains invalid JSON: {exc}")
+
+    # Check if the user clearly intended a file path that does not exist
+    if raw_input.endswith(".json") or "/" in raw_input or "\\" in raw_input:
+        raise ValueError(f"Input file not found: '{raw_input}'")
+
+    # Otherwise try parsing as inline JSON string
     try:
         data = json.loads(raw_input)
         if isinstance(data, dict):
             return data
-        raise ValueError("JSON must be a key-value dictionary object")
+        raise ValueError(
+            f"Inline JSON must be a key-value dictionary object, got {type(data).__name__}"
+        )
     except json.JSONDecodeError:
-        raise ValueError(f"Input is neither a valid file path nor valid inline JSON: '{raw_input}'")
+        raise ValueError(
+            f"Input is neither an existing file path nor valid inline JSON: '{raw_input}'"
+        )
 
 
 def main() -> int:

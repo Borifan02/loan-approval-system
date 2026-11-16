@@ -9,7 +9,8 @@ Performs health checks on:
   5. Validation engine
   6. Inference engine (end-to-end prediction)
   7. SHAP explainability engine
-  8. Agensi skill scripts
+  8. Agensi skill scripts & requirements
+  9. Final packaged distributable (loan-approval-ai-skill-final.zip)
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import zipfile
 from pathlib import Path
 
 # Ensure non-privileged writable cache directory for Matplotlib
@@ -49,13 +51,13 @@ def main() -> int:
         all_passed = False
 
     # 2. Dependency checks
-    packages = ["sklearn", "pandas", "numpy", "joblib", "shap", "matplotlib", "streamlit"]
+    packages = ["sklearn", "pandas", "numpy", "joblib", "shap", "matplotlib"]
     for pkg in packages:
         try:
             __import__(pkg)
-            report(f"Dependency '{pkg}'", True)
+            report(f"Skill Dependency '{pkg}'", True)
         except ImportError as err:
-            report(f"Dependency '{pkg}'", False, str(err))
+            report(f"Skill Dependency '{pkg}'", False, str(err))
             all_passed = False
 
     # 3. Model and Scaler Artifact Existence
@@ -128,12 +130,34 @@ def main() -> int:
 
     # 8. Agensi Skill Files
     skill_md = PROJECT_ROOT / "agensi-skill" / "SKILL.md"
+    skill_req = PROJECT_ROOT / "agensi-skill" / "requirements-skill.txt"
     skill_predict = PROJECT_ROOT / "agensi-skill" / "scripts" / "predict.py"
     skill_explain = PROJECT_ROOT / "agensi-skill" / "scripts" / "explain.py"
 
     report("Agensi SKILL.md", skill_md.is_file())
+    report("Agensi requirements-skill.txt", skill_req.is_file())
     report("Agensi scripts/predict.py", skill_predict.is_file())
     report("Agensi scripts/explain.py", skill_explain.is_file())
+
+    # 9. Packaged Distributable Verification
+    final_zip = PROJECT_ROOT / "loan-approval-ai-skill-final.zip"
+    if final_zip.is_file():
+        try:
+            with zipfile.ZipFile(final_zip, "r") as zf:
+                namelist = zf.namelist()
+                has_skill_md = "loan-approval-ai-skill/SKILL.md" in namelist
+                has_req = "loan-approval-ai-skill/requirements-skill.txt" in namelist
+                has_model = "loan-approval-ai-skill/models/rf_model.pkl" in namelist
+                has_predict = "loan-approval-ai-skill/scripts/predict.py" in namelist
+                has_explain = "loan-approval-ai-skill/scripts/explain.py" in namelist
+                zip_valid = all([has_skill_md, has_req, has_model, has_predict, has_explain])
+                report("Agensi Final ZIP Package", zip_valid, f"{final_zip.name} ({len(namelist)} items)")
+        except Exception as exc:
+            report("Agensi Final ZIP Package", False, str(exc))
+            all_passed = False
+    else:
+        report("Agensi Final ZIP Package", False, "Missing loan-approval-ai-skill-final.zip")
+        all_passed = False
 
     print("=" * 70)
     if all_passed:
