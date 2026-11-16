@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loan-approval"
+version = "1.0.0"
+description = "Production-grade loan approval prediction engine and explainable AI system"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Loan Approval System Contributors" }
+]
+keywords = ["machine-learning", "loan-approval", "credit-risk", "shap", "explainable-ai"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scikit-learn>=1.3.0",
+    "joblib>=1.3.0",
+    "shap>=0.44.0",
+    "matplotlib>=3.7.0"
+]
+
+[project.optional-dependencies]
+ui = [
+    "streamlit>=1.30.0"
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0"
+]
+
+[project.scripts]
+loan-approval = "cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,13 @@
+{
+  "ApplicantIncome": 2500,
+  "CoapplicantIncome": 0,
+  "LoanAmount": 200,
+  "Loan_Amount_Term": 180,
+  "Credit_History": 0,
+  "Gender": "Female",
+  "Married": "No",
+  "Dependents": "3+",
+  "Education": "Not Graduate",
+  "Self_Employed": "Yes",
+  "Property_Area": "Rural"
+}

@@ -1,0 +1,39 @@
+{
+  "model_name": "Loan Approval Random Forest Classifier",
+  "version": "1.0.0",
+  "framework": "scikit-learn",
+  "estimator_class": "RandomForestClassifier",
+  "n_estimators": 150,
+  "random_state": 42,
+  "training_dataset": "Kaggle Loan Prediction Dataset (614 records)",
+  "target_variable": "Loan_Status",
+  "classes": [0, 1],
+  "class_mapping": {
+    "0": "Rejected",
+    "1": "Approved"
+  },
+  "expected_features": [
+    "Credit_History",
+    "Total_Income_log",
+    "EMI_log",
+    "Balance_Income_log"
+  ],
+  "scaler_type": "StandardScaler",
+  "scaled_features": [
+    "Total_Income_log",
+    "EMI_log",
+    "Balance_Income_log"
+  ],
+  "scaler_mean": [
+    8.66941356,
+    -0.94428482,
+    8.88219807
+  ],
+  "scaler_scale": [
+    0.54465746,
+    0.55969285,
+    0.56634489
+  ],
+  "balance_income_offset_c": 1769.0,
+  "fairness_policy": "Demographic variables (Gender, Married, Dependents, Education, Self_Employed, Property_Area) were excluded from final model training to mitigate discrimination risks."
+}
